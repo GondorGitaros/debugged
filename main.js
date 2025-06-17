@@ -85,7 +85,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 1;
+    this.levelIndex = data.levelIndex || 0;
   }
 
   preload() {
