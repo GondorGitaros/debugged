@@ -37,3 +37,19 @@ canvas {
   padding: 10px;
   box-sizing: border-box;
 }
+
+#run-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 10px 20px;
+  background-color: #00ffcc;
+  color: #1e1e1e;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#run-btn:hover {
+  background-color: #00e6b3;
+}

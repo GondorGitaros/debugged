@@ -196,7 +196,7 @@ function returnTrue() {
 
       this.codeMirror = CodeMirror.fromTextArea(
         document.getElementById("terminal-editor"),
-        { mode: "javascript", lineNumbers: true }
+        { mode: "javascript", theme: "dracula", lineNumbers: true }
       );
       this.codeMirror.focus();
 
