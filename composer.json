@@ -1,0 +1,17 @@
+{
+    "name": "csasz/debugged",
+    "autoload": {
+        "psr-4": {
+            "Csasz\\Debugged\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Csaszar Daniel",
+            "email": "csaszardaniel81@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

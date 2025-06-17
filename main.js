@@ -1,59 +1,152 @@
+const user = localStorage.getItem("currentUser");
+if (user) {
+  console.log(`Welcome back, ${user}!`);
+} else {
+  window.location.href = "./login.html";
+  console.log("Please log in or register.");
+}
+
+function logout() {
+  localStorage.removeItem("currentUser");
+  window.location.href = "./";
+}
+
+document.getElementById("logout-button").addEventListener("click", () => {
+  logout();
+});
+
+// GAME
+
+size = {
+  width: 1920,
+  height: 1080,
+};
+
+const levels = [
+  {
+    platforms: [
+      { x: size.width * 0.2, y: size.height * 0.9 }, // Example relative positioning
+      { x: size.width * 0.3, y: size.height * 0.8 },
+      { x: size.width * 0.4, y: size.height * 0.7 },
+      { x: size.width * 0.5, y: size.height * 0.6 },
+      { x: size.width * 0.6, y: size.height * 0.5 },
+      { x: size.width * 0.7, y: size.height * 0.4 },
+      { x: size.width * 0.8, y: size.height * 0.3 },
+    ],
+    terminal: { x: size.width * 0.8, y: size.height * 0.25 },
+    playerStart: { x: 100, y: 900 },
+    puzzle: {
+      prompt: `// Level 1: Write a function returnTrue() that returns true.
+function returnTrue() {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const fn = new Function(userCode + "\nreturn returnTrue();");
+          return fn() === true;
+        } catch {
+          return false;
+        }
+      },
+    },
+  },
+  {
+    platforms: [
+      { x: 400, y: 1000 },
+      { x: 700, y: 900 },
+      { x: 1000, y: 800 },
+      { x: 1300, y: 700 },
+      { x: 1600, y: 600 },
+    ],
+    terminal: { x: 1600, y: 550 },
+    playerStart: { x: 100, y: 900 },
+    puzzle: {
+      prompt: `// Level 2: Write a function add(a, b) that returns the sum of a and b.
+function add(a, b) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const fn = new Function(userCode + "\nreturn add(2, 3);");
+          return fn() === 5;
+        } catch {
+          return false;
+        }
+      },
+    },
+  },
+  // Add more levels as needed
+];
+
 class MainScene extends Phaser.Scene {
   constructor() {
     super("MainScene");
     this.isWorldGlitched = true;
   }
 
+  init(data) {
+    this.levelIndex = data.levelIndex || 1;
+  }
+
   preload() {
-    this.load.image("player", "../assets/player.png");
-    this.load.image("terminal", "../assets/terminal.png");
+    this.load.image("player", "/assets/player.png");
+    this.load.image("terminal", "/assets/terminal.png");
   }
 
   create() {
-    this.add.text(20, 20, "👾 Debugged - Tutorial", {
-      font: "20px Courier",
-      fill: "#00ffcc",
-    });
+    const level = levels[this.levelIndex];
 
-    this.add.text(
-      20,
-      60,
-      "Use the arrows or WAD to move to get to the terminal.",
-      {
+    if (this.levelIndex === 0) {
+      this.add.text(20, 20, "👾 Debugged - Tutorial", {
         font: "20px Courier",
         fill: "#00ffcc",
-      }
-    );
+      });
 
-    this.add.text(
-      20,
-      100,
-      "Interact with the terminal and solve the puzzle to fix the world and remove the glitch effect.",
-      {
+      this.add.text(
+        20,
+        60,
+        "Use the arrows or WAD to move to get to the terminal.",
+        {
+          font: "20px Courier",
+          fill: "#00ffcc",
+        }
+      );
+
+      this.add.text(
+        20,
+        100,
+        "Interact with the terminal and solve the puzzle to fix the world and remove the glitch effect.",
+        {
+          font: "20px Courier",
+          fill: "#00ffcc",
+        }
+      );
+
+      this.add.text(
+        20,
+        140,
+        "I recommend fullscreen mode for the best experience.",
+        {
+          font: "20px Courier",
+          fill: "#00ffcc",
+        }
+      );
+
+      this.add.text(20, 180, "Press F11 to enter fullscreen!", {
         font: "20px Courier",
-        fill: "#00ffcc",
-      }
-    );
-
-    this.add.text(
-      20,
-      140,
-      "I recommend fullscreen mode for the best experience.",
-      {
-        font: "20px Courier",
-        fill: "#00ffcc",
-      }
-    );
-
-    // Create the "Enter Fullscreen" button text
-    this.add.text(20, 180, "Press F11 to enter fullscreen!", {
-      font: "20px Courier",
-      fill: "#ffff00",
-    });
+        fill: "#ffff00",
+      });
+    }
 
     this.player = this.physics.add
-      .sprite(100, size.height - 150, "player")
+      .sprite(level.playerStart.x, level.playerStart.y, "player")
       .setCollideWorldBounds(true);
+
+    const gfx = this.add.graphics();
+    gfx.fillStyle(0x8888ff, 1);
+    gfx.fillRect(0, 0, 200, 20);
+    gfx.generateTexture("platform", 200, 20);
+    gfx.destroy();
 
     // Create the ground
     const ground = this.add.rectangle(
@@ -77,23 +170,8 @@ class MainScene extends Phaser.Scene {
     });
 
     // Create platforms
-    const gfx = this.add.graphics();
-    gfx.fillStyle(0x8888ff, 1);
-    gfx.fillRect(0, 0, 200, 20);
-    gfx.generateTexture("platform", 200, 20);
-    gfx.destroy();
-
     this.platforms = this.physics.add.staticGroup();
-    const coords = [
-      { x: size.width * 0.2, y: size.height * 0.9 }, // Example relative positioning
-      { x: size.width * 0.3, y: size.height * 0.8 },
-      { x: size.width * 0.4, y: size.height * 0.7 },
-      { x: size.width * 0.5, y: size.height * 0.6 },
-      { x: size.width * 0.6, y: size.height * 0.5 },
-      { x: size.width * 0.7, y: size.height * 0.4 },
-      { x: size.width * 0.8, y: size.height * 0.3 },
-    ];
-    coords.forEach(({ x, y }) => {
+    level.platforms.forEach(({ x, y }) => {
       const platform = this.platforms
         .create(x, y, "platform")
         .setTint(Phaser.Display.Color.RandomRGB().color)
@@ -104,8 +182,8 @@ class MainScene extends Phaser.Scene {
 
     // Terminal setup
     this.terminal = this.physics.add.staticSprite(
-      size.width * 0.8,
-      size.height * 0.25,
+      level.terminal.x,
+      level.terminal.y,
       "terminal"
     );
     this.physics.add.overlap(this.player, this.terminal, () => {
@@ -127,6 +205,7 @@ class MainScene extends Phaser.Scene {
       }
     });
   }
+
   update() {
     // Handle player movement and interaction
     const speed = 200;
@@ -175,7 +254,6 @@ class MainScene extends Phaser.Scene {
     }
   }
 
-  // Open the terminal UI
   openTerminal() {
     this.inTerminal = true;
     this.scene.pause();
@@ -183,16 +261,9 @@ class MainScene extends Phaser.Scene {
     document.getElementById("terminal-container").style.display = "block";
 
     if (!this.codeMirror) {
-      document.getElementById("terminal-editor").value = `
-// Puzzle: Write a function returnTrue()
-// that returns true.
-// Do not change the function name or signature.
-// if you want to exit the terminal, press Escape.
-
-function returnTrue() {
-// your code here...
-}
-      `.trim();
+      // Use the level's puzzle prompt
+      document.getElementById("terminal-editor").value =
+        levels[this.levelIndex].puzzle.prompt;
 
       this.codeMirror = CodeMirror.fromTextArea(
         document.getElementById("terminal-editor"),
@@ -204,22 +275,31 @@ function returnTrue() {
         const userCode = this.codeMirror.getValue();
         let success = false;
         try {
-          // wrap user code and force a return from returnTrue()
-          const fn = new Function(userCode + "\nreturn returnTrue();");
-          success = fn();
+          // Use the level's puzzle test
+          success = levels[this.levelIndex].puzzle.test(userCode);
         } catch (err) {
           alert("Error in your code:\n" + err.message);
           return;
         }
 
-        if (success === true) {
+        if (success === true && this.levelIndex === 0) {
+          this.puzzleSolved();
+        } else if (success === true && this.levelIndex === 1) {
+          const platform = this.platforms
+            .create(1700, 500, "platform")
+            .setTint(0x00ff00)
+            .refreshBody();
+          platform.originalTint = platform.tintTopLeft;
+          this.closeTerminal();
+          // TODO FIX
           this.puzzleSolved();
         } else {
-          alert("Not quite—returnTrue() returned " + success);
+          alert("Not quite—try again!");
         }
       };
     }
   }
+
   closeTerminal() {
     document.getElementById("terminal-container").style.display = "none";
     this.scene.resume();
@@ -227,6 +307,7 @@ function returnTrue() {
     this.canInteract = false;
     this.input.keyboard.addCapture("W,A,S,D,E,SPACE,UP,DOWN,LEFT,RIGHT");
   }
+
   puzzleSolved() {
     // hide terminal UI
     document.getElementById("terminal-container").style.display = "none";
@@ -248,15 +329,21 @@ function returnTrue() {
       font: "40px Courier",
       fill: "#00ffcc",
     });
+    // After showing success, advance to next level if available
+    if (this.levelIndex + 1 < levels.length) {
+      setTimeout(() => {
+        this.scene.restart({ levelIndex: this.levelIndex + 1 });
+      }, 2000);
+    } else {
+      this.add.text(40, 400, "🏆 All levels complete! 🏆", {
+        font: "40px Courier",
+        fill: "#ffff00",
+      });
+    }
   }
 }
 
-size = {
-  width: 1920,
-  height: 1080,
-};
-
-function startGame() {
+function startGame(levelIndex = 0) {
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) {
     gameContainer.innerHTML = "";
@@ -276,7 +363,7 @@ function startGame() {
       height: size.height,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: MainScene,
+    scene: [new MainScene(levelIndex)],
   };
   new Phaser.Game(config);
 }
