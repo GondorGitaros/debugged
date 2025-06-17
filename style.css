@@ -9,3 +9,16 @@ body {
 canvas {
   display: block;
 }
+
+#terminal-container {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  width: 700px;
+  height: 400px;
+  background: #1e1e1e;
+  border: 2px solid #00ffcc;
+  display: none;
+  z-index: 10;
+  padding: 10px;
+}
