@@ -238,10 +238,8 @@ function returnTrue() {
   }
 }
 
-const FHD_WIDTH = 1920;
-const FHD_HEIGHT = 1080;
-const QHD_WIDTH = 2560;
-const QHD_HEIGHT = 1440;
+const TARGET_ASPECT_RATIO = 16 / 9;
+const ASPECT_RATIO_TOLERANCE = 0.05; // Allow for slight variations
 
 function startGame() {
   const gameContainer = document.getElementById("game-container");
@@ -268,7 +266,7 @@ function startGame() {
   new Phaser.Game(config);
 }
 
-function displayResolutionMessage(showFullscreenButton = false) {
+function displayAspectRatioMessage() {
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) {
     gameContainer.innerHTML = "";
@@ -285,21 +283,29 @@ function displayResolutionMessage(showFullscreenButton = false) {
     messageDiv.style.flexDirection = "column";
     messageDiv.style.justifyContent = "center";
     messageDiv.style.alignItems = "center";
-    messageDiv.innerHTML = `
-        <p>This game is best experienced in Full HD (1920x1080) or Quad HD (2560x1440).</p>
-        <p>Your current screen resolution is: ${window.screen.width}x${window.screen.height}</p>
-      `;
 
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const currentRatio = screenWidth / screenHeight;
+
+    messageDiv.innerHTML = `
+        <p>This game is best experienced on a 16:9 aspect ratio screen.</p>
+        <p>Your current screen resolution is: ${screenWidth}x${screenHeight} (Ratio: ${currentRatio.toFixed(
+      2
+    )})</p>
+    `;
     gameContainer.appendChild(messageDiv);
   }
 }
 
-const isFHD =
-  window.screen.width === FHD_WIDTH && window.screen.height === FHD_HEIGHT;
-const isQHD =
-  window.screen.width === QHD_WIDTH && window.screen.height === QHD_HEIGHT;
-if (isFHD || isQHD) {
+const currentScreenAspectRatio = window.screen.width / window.screen.height;
+
+if (
+  Math.abs(currentScreenAspectRatio - TARGET_ASPECT_RATIO) <
+  ASPECT_RATIO_TOLERANCE
+) {
   startGame();
 } else {
-  displayResolutionMessage(true); // Only recurse once
+  // If aspect ratio is not close to 16:9, show message and offer fullscreen button
+  displayAspectRatioMessage(true);
 }
