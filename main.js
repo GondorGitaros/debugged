@@ -13,10 +13,30 @@ class MainScene extends Phaser.Scene {
     const gameWidth = this.scale.width;
     const gameHeight = this.scale.height;
 
-    this.add.text(20, 20, "👾 Debugged - Sector 01", {
+    this.add.text(20, 20, "👾 Debugged - Tutorial", {
       font: "20px Courier",
       fill: "#00ffcc",
     });
+
+    this.add.text(
+      20,
+      60,
+      "Use the arrows or WAD to move to get to the terminal.",
+      {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      }
+    );
+
+    this.add.text(
+      20,
+      100,
+      "Interact with the terminal and solve the puzzle to fix the world and remove the glitch effect.",
+      {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      }
+    );
 
     this.player = this.physics.add
       .sprite(100, gameHeight - 150, "player")
@@ -151,10 +171,12 @@ class MainScene extends Phaser.Scene {
 
     if (!this.codeMirror) {
       document.getElementById("terminal-editor").value = `
-// Puzzle: Write a function fixPuzzle()
+// Puzzle: Write a function returnTrue()
 // that returns true.
+// Do not change the function name or signature.
+// if you want to exit the terminal, press Escape.
 
-function fixPuzzle() {
+function returnTrue() {
 // your code here...
 }
       `.trim();
@@ -169,8 +191,8 @@ function fixPuzzle() {
         const userCode = this.codeMirror.getValue();
         let success = false;
         try {
-          // wrap user code and force a return from fixPuzzle()
-          const fn = new Function(userCode + "\nreturn fixPuzzle();");
+          // wrap user code and force a return from returnTrue()
+          const fn = new Function(userCode + "\nreturn returnTrue();");
           success = fn();
         } catch (err) {
           alert("Error in your code:\n" + err.message);
@@ -180,7 +202,7 @@ function fixPuzzle() {
         if (success === true) {
           this.puzzleSolved();
         } else {
-          alert("Not quite—fixPuzzle() returned " + success);
+          alert("Not quite—returnTrue() returned " + success);
         }
       };
     }
@@ -206,6 +228,12 @@ function fixPuzzle() {
     this.isWorldGlitched = false;
     this.platforms.getChildren().forEach((platform) => {
       platform.setTint(0x00ccff);
+    });
+
+    // Show success message
+    this.add.text(40, 200, "🎉 Puzzle solved! The world is fixed! 🎉", {
+      font: "40px Courier",
+      fill: "#00ffcc",
     });
   }
 }
