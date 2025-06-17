@@ -10,9 +10,6 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
-    const gameWidth = this.scale.width;
-    const gameHeight = this.scale.height;
-
     this.add.text(20, 20, "👾 Debugged - Tutorial", {
       font: "20px Courier",
       fill: "#00ffcc",
@@ -39,14 +36,14 @@ class MainScene extends Phaser.Scene {
     );
 
     this.player = this.physics.add
-      .sprite(100, gameHeight - 150, "player")
+      .sprite(100, size.height - 150, "player")
       .setCollideWorldBounds(true);
 
     // Create the ground
     const ground = this.add.rectangle(
-      gameWidth / 2,
-      gameHeight - 20,
-      gameWidth,
+      size.width / 2,
+      size.height - 20,
+      size.width,
       40,
       0x555555
     );
@@ -72,13 +69,13 @@ class MainScene extends Phaser.Scene {
 
     this.platforms = this.physics.add.staticGroup();
     const coords = [
-      { x: gameWidth * 0.3, y: gameHeight * 0.85 }, // Example relative positioning
-      { x: gameWidth * 0.4, y: gameHeight * 0.75 },
-      { x: gameWidth * 0.5, y: gameHeight * 0.65 },
-      { x: gameWidth * 0.6, y: gameHeight * 0.55 },
-      { x: gameWidth * 0.7, y: gameHeight * 0.45 },
-      { x: gameWidth * 0.8, y: gameHeight * 0.35 },
-      { x: gameWidth * 0.9, y: gameHeight * 0.25 },
+      { x: size.width * 0.3, y: size.height * 0.85 }, // Example relative positioning
+      { x: size.width * 0.4, y: size.height * 0.75 },
+      { x: size.width * 0.5, y: size.height * 0.65 },
+      { x: size.width * 0.6, y: size.height * 0.55 },
+      { x: size.width * 0.7, y: size.height * 0.45 },
+      { x: size.width * 0.8, y: size.height * 0.35 },
+      { x: size.width * 0.9, y: size.height * 0.25 },
     ];
     coords.forEach(({ x, y }) => {
       const platform = this.platforms
@@ -91,8 +88,8 @@ class MainScene extends Phaser.Scene {
 
     // Terminal setup
     this.terminal = this.physics.add.staticSprite(
-      gameWidth * 0.9,
-      gameHeight * 0.25 - 50,
+      size.width * 0.9,
+      size.height * 0.25 - 50,
       "terminal"
     );
     this.physics.add.overlap(this.player, this.terminal, () => {
@@ -238,8 +235,10 @@ function returnTrue() {
   }
 }
 
-const TARGET_ASPECT_RATIO = 16 / 9;
-const ASPECT_RATIO_TOLERANCE = 0.05; // Allow for slight variations
+size = {
+  width: 1920,
+  height: 1080,
+};
 
 function startGame() {
   const gameContainer = document.getElementById("game-container");
@@ -255,57 +254,14 @@ function startGame() {
       arcade: { gravity: { y: 500 }, debug: false },
     },
     scale: {
-      mode: Phaser.Scale.FIT, // Or RESIZE, FIT is often good for specific aspect ratios
+      mode: Phaser.Scale.FIT,
       parent: "game-container",
-      width: "100%",
-      height: "100%",
+      width: size.width,
+      height: size.height,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
     scene: MainScene,
   };
   new Phaser.Game(config);
 }
-
-function displayAspectRatioMessage() {
-  const gameContainer = document.getElementById("game-container");
-  if (gameContainer) {
-    gameContainer.innerHTML = "";
-
-    const messageDiv = document.createElement("div");
-    messageDiv.style.color = "#00ffcc";
-    messageDiv.style.fontFamily = "Courier, monospace";
-    messageDiv.style.fontSize = "20px";
-    messageDiv.style.textAlign = "center";
-    messageDiv.style.padding = "50px";
-    messageDiv.style.width = "100%";
-    messageDiv.style.height = "100%";
-    messageDiv.style.display = "flex";
-    messageDiv.style.flexDirection = "column";
-    messageDiv.style.justifyContent = "center";
-    messageDiv.style.alignItems = "center";
-
-    const screenWidth = window.screen.width;
-    const screenHeight = window.screen.height;
-    const currentRatio = screenWidth / screenHeight;
-
-    messageDiv.innerHTML = `
-        <p>This game is best experienced on a 16:9 aspect ratio screen.</p>
-        <p>Your current screen resolution is: ${screenWidth}x${screenHeight} (Ratio: ${currentRatio.toFixed(
-      2
-    )})</p>
-    `;
-    gameContainer.appendChild(messageDiv);
-  }
-}
-
-const currentScreenAspectRatio = window.screen.width / window.screen.height;
-
-if (
-  Math.abs(currentScreenAspectRatio - TARGET_ASPECT_RATIO) <
-  ASPECT_RATIO_TOLERANCE
-) {
-  startGame();
-} else {
-  // If aspect ratio is not close to 16:9, show message and offer fullscreen button
-  displayAspectRatioMessage(true);
-}
+startGame();
