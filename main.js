@@ -35,6 +35,33 @@ class MainScene extends Phaser.Scene {
       }
     );
 
+    this.add.text(
+      20,
+      140,
+      "I recommend fullscreen mode for the best experience.",
+      {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      }
+    );
+
+    // Create the "Enter Fullscreen" button text
+    let fullscreenButtonText = this.add.text(20, 180, "[ Enter Fullscreen ]", {
+      font: "20px Courier",
+      fill: "#ffff00",
+    });
+    fullscreenButtonText.setInteractive({ useHandCursor: true });
+
+    fullscreenButtonText.on("pointerdown", () => {
+      if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+        fullscreenButtonText.setText("[ Enter Fullscreen ]");
+      } else {
+        this.scale.startFullscreen();
+        fullscreenButtonText.setText("[ Exit Fullscreen ]");
+      }
+    });
+
     this.player = this.physics.add
       .sprite(100, size.height - 150, "player")
       .setCollideWorldBounds(true);
@@ -45,7 +72,7 @@ class MainScene extends Phaser.Scene {
       size.height - 20,
       size.width,
       40,
-      0x555555
+      0xa5c9ff
     );
     this.physics.add.existing(ground, true);
     this.physics.add.collider(this.player, ground);
@@ -69,13 +96,13 @@ class MainScene extends Phaser.Scene {
 
     this.platforms = this.physics.add.staticGroup();
     const coords = [
-      { x: size.width * 0.3, y: size.height * 0.85 }, // Example relative positioning
-      { x: size.width * 0.4, y: size.height * 0.75 },
-      { x: size.width * 0.5, y: size.height * 0.65 },
-      { x: size.width * 0.6, y: size.height * 0.55 },
-      { x: size.width * 0.7, y: size.height * 0.45 },
-      { x: size.width * 0.8, y: size.height * 0.35 },
-      { x: size.width * 0.9, y: size.height * 0.25 },
+      { x: size.width * 0.2, y: size.height * 0.9 }, // Example relative positioning
+      { x: size.width * 0.3, y: size.height * 0.8 },
+      { x: size.width * 0.4, y: size.height * 0.7 },
+      { x: size.width * 0.5, y: size.height * 0.6 },
+      { x: size.width * 0.6, y: size.height * 0.5 },
+      { x: size.width * 0.7, y: size.height * 0.4 },
+      { x: size.width * 0.8, y: size.height * 0.3 },
     ];
     coords.forEach(({ x, y }) => {
       const platform = this.platforms
@@ -228,7 +255,7 @@ function returnTrue() {
     });
 
     // Show success message
-    this.add.text(40, 200, "🎉 Puzzle solved! The world is fixed! 🎉", {
+    this.add.text(40, 300, "🎉 Puzzle solved! The world is fixed! 🎉", {
       font: "40px Courier",
       fill: "#00ffcc",
     });

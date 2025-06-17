@@ -9,7 +9,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden; /* Prevent scrollbars */
-  background-color: #000000; /* Match game background */
+  background-color: #5d5d5d; /* Match game background */
 }
 
 #game-container {
