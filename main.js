@@ -46,20 +46,9 @@ class MainScene extends Phaser.Scene {
     );
 
     // Create the "Enter Fullscreen" button text
-    let fullscreenButtonText = this.add.text(20, 180, "[ Enter Fullscreen ]", {
+    this.add.text(20, 180, "Press F11 to enter fullscreen!", {
       font: "20px Courier",
       fill: "#ffff00",
-    });
-    fullscreenButtonText.setInteractive({ useHandCursor: true });
-
-    fullscreenButtonText.on("pointerdown", () => {
-      if (this.scale.isFullscreen) {
-        this.scale.stopFullscreen();
-        fullscreenButtonText.setText("[ Enter Fullscreen ]");
-      } else {
-        this.scale.startFullscreen();
-        fullscreenButtonText.setText("[ Exit Fullscreen ]");
-      }
     });
 
     this.player = this.physics.add
@@ -191,7 +180,6 @@ class MainScene extends Phaser.Scene {
     this.inTerminal = true;
     this.scene.pause();
     this.input.keyboard.removeCapture("W,A,S,D,E,SPACE,UP,DOWN,LEFT,RIGHT");
-    this.scale.stopFullscreen();
     document.getElementById("terminal-container").style.display = "block";
 
     if (!this.codeMirror) {
@@ -225,7 +213,6 @@ function returnTrue() {
         }
 
         if (success === true) {
-          this.scale.startFullscreen();
           this.puzzleSolved();
         } else {
           alert("Not quite—returnTrue() returned " + success);
