@@ -6,6 +6,7 @@ class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image("player", "assets/player.png");
+    this.load.image("terminal", "assets/terminal.png");
   }
 
   create() {
@@ -62,12 +63,6 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.platforms);
 
     // Terminal setup
-    const tGfx = this.add.graphics();
-    tGfx.fillStyle(0x222222, 1);
-    tGfx.fillRect(0, 0, 48, 48);
-    tGfx.generateTexture("terminal", 48, 48);
-    tGfx.destroy();
-
     this.terminal = this.physics.add.staticSprite(500, 520, "terminal");
     this.physics.add.overlap(this.player, this.terminal, () => {
       this.canInteract = true;
@@ -105,6 +100,12 @@ class MainScene extends Phaser.Scene {
 
     if (up && this.player.body.touching.down) {
       this.player.setVelocityY(-350);
+    }
+
+    if (this.physics.overlap(this.player, this.terminal) && !this.inTerminal) {
+      this.canInteract = true;
+    } else {
+      this.canInteract = false;
     }
 
     if (this.canInteract && !this.inTerminal) {
