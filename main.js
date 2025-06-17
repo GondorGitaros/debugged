@@ -1,6 +1,7 @@
 class MainScene extends Phaser.Scene {
   constructor() {
     super("MainScene");
+    this.isWorldGlitched = true;
   }
 
   preload() {
@@ -87,7 +88,6 @@ class MainScene extends Phaser.Scene {
       }
     });
   }
-
   update() {
     // Handle player movement and interaction
     const speed = 200;
@@ -117,6 +117,16 @@ class MainScene extends Phaser.Scene {
       }
     } else {
       this.interactText.setVisible(false);
+    }
+
+    // glitch effect
+    if (this.isWorldGlitched) {
+      this.platforms.getChildren().forEach((platform) => {
+        // Flicker tint rapidly for a glitchy effect
+        if (Phaser.Math.RND.frac() < 0.1) {
+          platform.setTint(Phaser.Display.Color.RandomRGB().color);
+        }
+      });
     }
   }
 
@@ -179,6 +189,12 @@ function fixPuzzle() {
     this.closeTerminal();
     this.terminal.setTint(0x00ff00);
     this.cameras.main.flash(300, 0, 255, 0);
+
+    // Fix the world!
+    this.isWorldGlitched = false;
+    this.platforms.getChildren().forEach((platform) => {
+      platform.setTint(0x00ccff);
+    });
   }
 }
 
