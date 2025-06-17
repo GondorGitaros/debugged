@@ -115,8 +115,8 @@ class MainScene extends Phaser.Scene {
 
     // Terminal setup
     this.terminal = this.physics.add.staticSprite(
-      size.width * 0.9,
-      size.height * 0.25 - 50,
+      size.width * 0.8,
+      size.height * 0.25,
       "terminal"
     );
     this.physics.add.overlap(this.player, this.terminal, () => {
@@ -191,6 +191,7 @@ class MainScene extends Phaser.Scene {
     this.inTerminal = true;
     this.scene.pause();
     this.input.keyboard.removeCapture("W,A,S,D,E,SPACE,UP,DOWN,LEFT,RIGHT");
+    this.scale.stopFullscreen();
     document.getElementById("terminal-container").style.display = "block";
 
     if (!this.codeMirror) {
@@ -224,6 +225,7 @@ function returnTrue() {
         }
 
         if (success === true) {
+          this.scale.startFullscreen();
           this.puzzleSolved();
         } else {
           alert("Not quite—returnTrue() returned " + success);

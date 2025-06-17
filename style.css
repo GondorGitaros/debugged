@@ -23,10 +23,10 @@ canvas {
 
 #terminal-container {
   position: absolute;
-  top: 50px;
-  left: 50px;
-  width: 700px;
-  height: 400px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: #1e1e1e;
   border: 2px solid #00ffcc;
   display: none;
