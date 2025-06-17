@@ -1,4 +1,4 @@
 # Debugged
 
-A fun web based game with Phraser.js
+A fun web based game with Phaser.js
 from programmers to programmers
