@@ -10,22 +10,25 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
+    const gameWidth = this.scale.width;
+    const gameHeight = this.scale.height;
+
     this.add.text(20, 20, "👾 Debugged - Sector 01", {
       font: "20px Courier",
       fill: "#00ffcc",
     });
 
     this.player = this.physics.add
-      .sprite(100, 450, "player")
+      .sprite(100, gameHeight - 150, "player")
       .setCollideWorldBounds(true);
 
     // Create the ground
     const ground = this.add.rectangle(
-      0,
-      size.height - 10,
-      size.width * 2,
-      20,
-      0x444444
+      gameWidth / 2,
+      gameHeight - 20,
+      gameWidth,
+      40,
+      0x555555
     );
     this.physics.add.existing(ground, true);
     this.physics.add.collider(this.player, ground);
@@ -49,21 +52,29 @@ class MainScene extends Phaser.Scene {
 
     this.platforms = this.physics.add.staticGroup();
     const coords = [
-      { x: size.width / 4, y: size.height - 100 },
-      { x: size.width / 2, y: size.height - 200 },
-      { x: (size.width / 4) * 3, y: size.height - 300 },
+      { x: gameWidth * 0.3, y: gameHeight * 0.85 }, // Example relative positioning
+      { x: gameWidth * 0.4, y: gameHeight * 0.75 },
+      { x: gameWidth * 0.5, y: gameHeight * 0.65 },
+      { x: gameWidth * 0.6, y: gameHeight * 0.55 },
+      { x: gameWidth * 0.7, y: gameHeight * 0.45 },
+      { x: gameWidth * 0.8, y: gameHeight * 0.35 },
+      { x: gameWidth * 0.9, y: gameHeight * 0.25 },
     ];
     coords.forEach(({ x, y }) => {
-      this.platforms
+      const platform = this.platforms
         .create(x, y, "platform")
         .setTint(Phaser.Display.Color.RandomRGB().color)
         .refreshBody();
+      platform.originalTint = platform.tintTopLeft;
     });
-
     this.physics.add.collider(this.player, this.platforms);
 
     // Terminal setup
-    this.terminal = this.physics.add.staticSprite(500, 520, "terminal");
+    this.terminal = this.physics.add.staticSprite(
+      gameWidth * 0.9,
+      gameHeight * 0.25 - 50,
+      "terminal"
+    );
     this.physics.add.overlap(this.player, this.terminal, () => {
       this.canInteract = true;
     });
@@ -199,22 +210,68 @@ function fixPuzzle() {
   }
 }
 
-// Initialize Phaser game
-const size = {
-  width: 1000,
-  height: 750,
-};
+const FHD_WIDTH = 1920;
+const FHD_HEIGHT = 1080;
+const QHD_WIDTH = 2560;
+const QHD_HEIGHT = 1440;
 
-const config = {
-  type: Phaser.AUTO,
-  width: size.width,
-  height: size.height,
-  backgroundColor: "#111122",
-  physics: {
-    default: "arcade",
-    arcade: { gravity: { y: 500 }, debug: false },
-  },
-  scene: MainScene,
-};
+function startGame() {
+  const gameContainer = document.getElementById("game-container");
+  if (gameContainer) {
+    gameContainer.innerHTML = "";
+  }
 
-new Phaser.Game(config);
+  const config = {
+    type: Phaser.AUTO,
+    backgroundColor: "#111122",
+    physics: {
+      default: "arcade",
+      arcade: { gravity: { y: 500 }, debug: false },
+    },
+    scale: {
+      mode: Phaser.Scale.FIT, // Or RESIZE, FIT is often good for specific aspect ratios
+      parent: "game-container",
+      width: "100%",
+      height: "100%",
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+    scene: MainScene,
+  };
+  new Phaser.Game(config);
+}
+
+function displayResolutionMessage(showFullscreenButton = false) {
+  const gameContainer = document.getElementById("game-container");
+  if (gameContainer) {
+    gameContainer.innerHTML = "";
+
+    const messageDiv = document.createElement("div");
+    messageDiv.style.color = "#00ffcc";
+    messageDiv.style.fontFamily = "Courier, monospace";
+    messageDiv.style.fontSize = "20px";
+    messageDiv.style.textAlign = "center";
+    messageDiv.style.padding = "50px";
+    messageDiv.style.width = "100%";
+    messageDiv.style.height = "100%";
+    messageDiv.style.display = "flex";
+    messageDiv.style.flexDirection = "column";
+    messageDiv.style.justifyContent = "center";
+    messageDiv.style.alignItems = "center";
+    messageDiv.innerHTML = `
+        <p>This game is best experienced in Full HD (1920x1080) or Quad HD (2560x1440).</p>
+        <p>Your current screen resolution is: ${window.screen.width}x${window.screen.height}</p>
+      `;
+
+    gameContainer.appendChild(messageDiv);
+  }
+}
+
+const isFHD =
+  window.screen.width === FHD_WIDTH && window.screen.height === FHD_HEIGHT;
+const isQHD =
+  window.screen.width === QHD_WIDTH && window.screen.height === QHD_HEIGHT;
+if (isFHD || isQHD) {
+  startGame();
+} else {
+  displayResolutionMessage(true); // Only recurse once
+}
