@@ -4,6 +4,7 @@ size = {
 };
 
 const levels = [
+	// Tutorial Level
 	{
 		platforms: [
 			{ x: size.width * 0.2, y: size.height * 0.9 },
@@ -16,8 +17,15 @@ const levels = [
 		],
 		terminal: { x: size.width * 0.8, y: size.height * 0.25 },
 		playerStart: { x: 100, y: 900 },
+		successMessage: "Tutorial completed!",
 		puzzle: {
-			prompt: `// Level 1: Write a function returnTrue() that returns true.
+			prompt: `/* 
+Tutorial: Write a function returnTrue() that returns true.
+
+if you want to exit press escape, but if you solve the 
+puzzle you can continue to the next level, and the terminal 
+will close automatically. 
+*/
 function returnTrue() {
   // your code here...
 }`,
@@ -67,14 +75,25 @@ function returnTrue() {
 			);
 
 			scene.add.text(20, 180, "Press F11 to enter fullscreen!", {
-				font: "20px Courier",
+				font: "24px Courier",
 				fill: "#ffff00",
 			});
+			scene.add.text(
+				20,
+				220,
+				"Note: The game becomes increasingly difficult.",
+				{
+					font: "24px Courier",
+					fill: "#ff0000",
+				}
+			);
 		},
+
 		onPuzzleSuccess: function (scene) {
 			scene.puzzleSolved();
 		},
 	},
+	// Level 1
 	{
 		platforms: [
 			{ x: 400, y: 1000 },
@@ -86,25 +105,40 @@ function returnTrue() {
 		terminal: { x: 1600, y: 550 },
 		playerStart: { x: 100, y: 900 },
 		winBlock: { x: 1000, y: 400 },
+		successMessage: "Level 1 completed!",
 		puzzle: {
-			prompt: `// Level 2: Write a function add(a, b) that returns the sum of a and b.
+			prompt: `/*
+Level 1: Write a function add(a, b) that returns the sum of a and b.
+*/
 function add(a, b) {
   // your code here...
 }`,
 			test: function (userCode) {
 				try {
 					const fn = new Function(userCode + "\nreturn add(2, 3);");
-					return fn() === 5;
+					const fn2 = new Function(userCode + "\nreturn add(5, 5);");
+					const fn3 = new Function(userCode + "\nreturn add(-2, 44563);");
+					return fn() === 5 && fn2() === 10 && fn3() === 44561;
 				} catch {
 					return false;
 				}
 			},
 		},
 		setup: function (scene) {
-			scene.add.text(20, 20, "👾 Debugged - Level 2", {
+			scene.add.text(20, 20, "👾 Debugged - Level 1", {
 				font: "20px Courier",
 				fill: "#00ffcc",
 			});
+
+			scene.add.text(
+				20,
+				60,
+				"In this level you will need to collect some data",
+				{
+					font: "24px Courier",
+					fill: "#00ffcc",
+				}
+			);
 
 			const level = levels[scene.levelIndex];
 			const winBlock = scene.physics.add.staticSprite(
@@ -135,6 +169,91 @@ function add(a, b) {
 			platform.originalTint = platform.tintTopLeft;
 		},
 	},
+	// Level 2
+	{
+		platforms: [
+			{ x: 300, y: 1000 },
+			{ x: 600, y: 900 },
+			{ x: 900, y: 800 },
+			{ x: 1200, y: 700 },
+			{ x: 1500, y: 600 },
+		],
+		playerStart: { x: 100, y: 900 },
+		winBlock: { x: 1500, y: 550 },
+		terminal: { x: 1500, y: 975 },
+		successMessage: "Level 2 completed! Platforms stabilized.",
+		puzzle: {
+			prompt: `/*
+Level 2: Unstable Ground
+Nyx taunts: "The platforms are tied to a data stream. If you can't calculate the correct checksum, they'll stay unstable forever!"
+Puzzle: Write a function calculateChecksum(data) that takes an array of numbers and returns their sum.
+*/
+function calculateChecksum(data) {
+  // your code here...
+}`,
+			test: function (userCode) {
+				try {
+					const code = userCode;
+					const fn1 = new Function(
+						code + "\nreturn calculateChecksum([10, 25, 5, 60]);"
+					)();
+					const fn2 = new Function(
+						code + "\nreturn calculateChecksum([1, 2, 3, 4, 5]);"
+					)();
+					const fn3 = new Function(
+						code + "\nreturn calculateChecksum([-10, 10, -5, 5, 0]);"
+					)();
+
+					return fn1 === 100 && fn2 === 15 && fn3 === 0;
+				} catch {
+					return false;
+				}
+			},
+		},
+		setup: function (scene) {
+			scene.add.text(20, 20, "👾 Debugged - Level 2", {
+				font: "20px Courier",
+				fill: "#00ffcc",
+			});
+			scene.add.text(20, 60, "The platforms are unstable!", {
+				font: "24px Courier",
+				fill: "#ff0000",
+			});
+
+			const level = levels[scene.levelIndex];
+			const winBlock = scene.physics.add.staticSprite(
+				level.winBlock.x,
+				level.winBlock.y,
+				"data"
+			);
+
+			// Add an overlap check. When player touches it, call puzzleSolved.
+			scene.physics.add.overlap(
+				scene.player,
+				winBlock,
+				() => {
+					scene.puzzleSolved();
+					winBlock.destroy();
+				},
+				null,
+				scene
+			);
+		},
+
+		onPuzzleSuccess: function (scene) {
+			scene.closeTerminal();
+			scene.platforms.getChildren().forEach((platform) => {
+				if (platform.flickerTimer) {
+					platform.flickerTimer.remove();
+					platform.flickerTimer = null;
+					platform.setVisible(true);
+					platform.enableBody(true, platform.x, platform.y, true, true);
+					platform.setTint(0x00ccff);
+				}
+			});
+		},
+	},
+
 	// TODO add more levels
 ];
 
@@ -207,7 +326,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	init(data) {
-		this.levelIndex = data.levelIndex || 0;
+		this.levelIndex = data.levelIndex || 2;
 		this.isWorldGlitched = true;
 	}
 
@@ -262,6 +381,24 @@ class MainScene extends Phaser.Scene {
 				.setTint(Phaser.Display.Color.RandomRGB().color)
 				.refreshBody();
 			platform.originalTint = platform.tintTopLeft;
+
+			if (this.levelIndex === 2 && this.isWorldGlitched) {
+				platform.flickerTimer = this.time.addEvent({
+					delay: Phaser.Math.Between(500, 2500),
+					callback: () => {
+						if (!platform.body) return;
+						platform.setVisible(!platform.visible);
+						if (platform.visible) {
+							platform.enableBody(true, platform.x, platform.y, true, true);
+							platform.flickerTimer.delay = Phaser.Math.Between(250, 600);
+						} else {
+							platform.disableBody(true, true);
+							platform.flickerTimer.delay = Phaser.Math.Between(2000, 4000);
+						}
+					},
+					loop: true,
+				});
+			}
 		});
 		this.physics.add.collider(this.player, this.platforms);
 
@@ -369,7 +506,6 @@ class MainScene extends Phaser.Scene {
 				const userCode = this.codeMirror.getValue();
 				let success = false;
 				try {
-					// Use the level's puzzle test
 					success = levels[this.levelIndex].puzzle.test(userCode);
 				} catch (err) {
 					alert("Error in your code:\n" + err.message);
@@ -397,6 +533,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	puzzleSolved() {
+		const level = levels[this.levelIndex];
 		// hide terminal UI
 		document.getElementById("terminal-container").style.display = "none";
 		this.scene.resume();
@@ -413,7 +550,7 @@ class MainScene extends Phaser.Scene {
 		});
 
 		// Show success message
-		this.add.text(40, 300, "🎉 Puzzle solved! The world is fixed! 🎉", {
+		this.add.text(40, 300, level.successMessage, {
 			font: "40px Courier",
 			fill: "#00ffcc",
 		});

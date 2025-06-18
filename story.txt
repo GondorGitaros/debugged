@@ -1,0 +1,80 @@
+The Full Story
+You are Alex, a brilliant programmer who has just finished creating your masterpiece: a vast, beautiful virtual world. But on the day of its launch, a rival hacker known as "Nyx" unleashes a sophisticated, multi-layered virus that corrupts your creation from the inside out. The world begins to glitch, its fundamental laws of physics breaking down.
+
+Nyx, who believes that chaos is the true form of beauty, taunts you from within the code, leaving behind corrupted terminals that act as the virus's entry points. To save your world, you must dive into the code, solve the puzzles Nyx has laid as traps, and systematically purge the corruption, layer by layer. It's a race against time to debug your world before it collapses entirely, culminating in a final confrontation with the core of Nyx's virus to reclaim your creation.
+
+Level Breakdown
+Act 1: The Initial Corruption (Levels 0-4) The player is introduced to the world, the core mechanics, and the antagonist.
+
+Level 0: The Playground (Tutorial)
+
+Story: The world is pristine. This level introduces movement and the terminal with a simple diagnostic check.
+Puzzle: returnTrue() - A basic function to confirm system status.
+Level 1: The First Glitch
+
+Story: The world suddenly glitches. Colors flicker. A message from Nyx appears: "Your world is my playground now."
+Puzzle: add(a, b) - A simple arithmetic function to fix a corrupted data packet, which restores a bridge.
+Level 2: Unstable Ground
+
+Story: The virus affects the physics engine. Platforms flicker in and out of existence. Nyx taunts: "Can't trust the ground beneath your feet, can you?"
+Puzzle: isPlatformStable(boolean) - A function to check a flag and stabilize a set of platforms.
+Level 3: The Color Drain
+
+Story: The virus drains the world of color, turning it monochrome. Nyx: "A world without color is so... elegant."
+Puzzle: restoreColor("hex_code") - A function that returns a color string, restoring color to key platforms needed to see the path forward.
+Level 4: The Echo Chamber
+
+Story: The audio engine is corrupted. Sounds are distorted and dangerously distracting.
+Puzzle: repeatString("word", count) - A string manipulation puzzle to fix a corrupted audio loop, which reveals a hidden path.
+Act 2: Deeper into the Code (Levels 5-11) Puzzles become more complex, introducing algorithms and data structures. The story reveals the depth of the corruption.
+
+Level 5: The Data Maze
+
+Story: You enter the file system, represented as a literal maze. Corrupted data blocks your path. Nyx: "Lost in your own data? Pathetic."
+Puzzle: findInArray(array, value) - An array search function to locate a "key" file and clear a path in the maze.
+Level 6: The Loop Trap
+
+Story: Nyx traps a section of the world in a time loop, resetting your progress every few seconds.
+Puzzle: sumArray(numbers) - A for loop puzzle. Correctly summing the values breaks the time loop.
+Level 7: The Object-Oriented Obstacle
+
+Story: The virus corrupts the player object itself, making your jump height and speed unpredictable. Nyx: "Your very being is just an object I can manipulate."
+Puzzle: createPlayer({health: 100, speed: 200}) - An object creation puzzle to restore your character's default properties.
+Level 8: The Conditional Abyss
+
+Story: A chasm is spanned by a bridge that only appears if a complex and faulty conditional is met.
+Puzzle: checkConditions(a, b, c) - A complex if/else logic puzzle to permanently stabilize the bridge.
+Level 9: The Memory Leak River
+
+Story: A "river" of leaking memory flows through the level, slowing you down. Nyx: "Drowning in your own incompetence."
+Puzzle: clearMemory(array) - A puzzle about clearing an array to plug the memory leak.
+Level 10: The Recursive Tower
+
+Story: You must climb a tower that generates infinitely due to a runaway recursive function.
+Puzzle: factorial(n) - A recursion puzzle. Providing the correct base case stops the tower from growing and reveals the exit.
+Level 11: The Firewall
+
+Story: You reach a massive, literal firewall. Nyx's presence is stronger. "You've come far. But this is the end of the line."
+Puzzle: filterArray(array, conditionFn) - A higher-order function puzzle to de-authorize Nyx's credentials and breach the firewall.
+Act 3: The Core Confrontation (Levels 12-16) The final act. Puzzles are at their most difficult, leading to a final showdown.
+
+Level 12: Inside the Kernel
+
+Story: You're inside the system kernel. The world is abstract, made of pure, shifting code.
+Puzzle: fetchData(url, callback) - An asynchronous puzzle to retrieve a critical system file without crashing the kernel.
+Level 13: The Corrupted Scheduler
+
+Story: The process scheduler is broken, causing platforms and hazards to appear out of order.
+Puzzle: sortArray(array) - A sorting algorithm puzzle to fix the scheduler and restore order to the level's events.
+Level 14: The Polymorphic Beast
+
+Story: Nyx unleashes a "polymorphic" virus guardian that constantly changes its form and attack patterns.
+Puzzle: getArea(shape) - A polymorphism puzzle. The function must correctly calculate the area for different shape objects (squares, circles) to "standardize" the beast and make it vulnerable.
+Level 15: The Rootkit
+
+Story: The final terminal. You must remove Nyx's rootkit. Nyx is desperate: "You can't erase me! I am this world now!"
+Puzzle: The final, most complex puzzle. It requires unscrambling a deeply nested, corrupted JSON object representing the core system configuration.
+Level 16: The Reboot (Epilogue)
+
+Story: The rootkit is purged. The world violently glitches and reboots into its original, pristine state. You stand in the perfect world you created. A message appears: "System integrity restored. Welcome back, Admin."
+Puzzle: None. This is a playable epilogue, a victory lap through the beautiful, fixed world.
