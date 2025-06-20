@@ -675,6 +675,101 @@ function processData(data) {
       }
     },
   },
+  // level 6
+  {
+    platforms: [
+      { x: 780, y: 1000 },
+      { x: 900, y: 900 },
+      { x: 900, y: 800 },
+      { x: 1500, y: 600 },
+    ],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1500, y: 550 },
+    terminal: { x: 300, y: 975 },
+    successMessage: "Level 2 completed! Platforms stabilized.",
+    puzzle: {
+      prompt: `/*
+Level 6: Advanced Filtering
+Nyx taunts: "The data is too messy!
+Write a function cleanData(data) that takes an array of numbers
+and returns a new array with all non-positive numbers removed."
+*/
+function cleanData(data) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(code + "\nreturn cleanData([-1, 2, 3]);")();
+          const fn2 = new Function(code + "\nreturn cleanData([0, 5, -6]);")();
+          const fn3 = new Function(
+            code + "\nreturn cleanData([-10, 0, 10]);"
+          )();
+
+          return (
+            JSON.stringify(fn1) === JSON.stringify([2, 3]) &&
+            JSON.stringify(fn2) === JSON.stringify([5]) &&
+            JSON.stringify(fn3) === JSON.stringify([10])
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 6", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+      // STORY
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the data, making it too messy.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+      scene.add.text(20, 140, "Nyx taunts: 'You can't clean this data!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+
+      const platform = scene.platforms
+        .create(1200, 700, "platform")
+        .setTint(0x00ff00)
+        .refreshBody();
+      platform.originalTint = platform.tintTopLeft;
+    },
+  },
 
   // TODO add more levels
 ];
@@ -753,7 +848,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 0;
+    this.levelIndex = data.levelIndex || 6;
     this.totalTime = data.totalTime || 0;
     this.isWorldGlitched = true;
   }
