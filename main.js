@@ -4,6 +4,7 @@ size = {
 };
 
 const levels = [
+  // there will be 16 levels in total with increasing difficulty
   // Tutorial Level
   {
     platforms: [
@@ -210,8 +211,11 @@ function add(a, b) {
     puzzle: {
       prompt: `/*
 Level 2: Unstable Ground
-Nyx taunts: "The platforms are tied to a data stream. If you can't calculate the correct checksum, they'll stay unstable forever!"
-Puzzle: Write a function calculateChecksum(data) that takes an array of numbers and returns their sum.
+Nyx taunts: "The platforms are tied to a data stream. 
+If you can't calculate the correct checksum, 
+they'll stay unstable forever!"
+Puzzle: Write a function calculateChecksum(data) 
+that takes an array of numbers and returns their sum.
 */
 function calculateChecksum(data) {
   // your code here...
@@ -270,7 +274,7 @@ function calculateChecksum(data) {
 
       scene.add.text(
         20,
-        160,
+        165,
         "If you can't calculate the correct checksum, they'll stay unstable forever!'",
         {
           font: "24px Courier",
@@ -309,7 +313,6 @@ function calculateChecksum(data) {
           platform.setTint(0x00ccff);
         }
       });
-      scene.isWorldGlitched = false;
     },
   },
   // level 3
@@ -325,11 +328,14 @@ function calculateChecksum(data) {
     playerStart: { x: 100, y: 900 },
     winBlock: { x: 1700, y: 450 },
     terminal: { x: 400, y: 995 },
-    successMessage: "Level 3 completed! The world is stabilizing.",
+    successMessage: "Level 3 completed!.",
     puzzle: {
       prompt: `/*
 Level 3: Glitchy World
-Nyx taunts: "The world is glitching! Write a function fixGlitch(data) that takes an array of numbers and returns a new array with all negative numbers replaced by their absolute values."
+Nyx taunts: "The world is glitching! Write a function 
+fixGlitch(data) that takes an array of numbers and
+returns a new array with all negative numbers 
+replaced by their absolute values."
 */
 function fixGlitch(data) {
   // your code here...
@@ -398,7 +404,7 @@ function fixGlitch(data) {
         "platform"
       );
       scene.barrier.setTintFill(0xff0000);
-      scene.barrier.setScale(0.5, 3).refreshBody();
+      scene.barrier.setScale(0.05, 6).refreshBody();
       scene.physics.add.collider(scene.player, scene.barrier);
 
       // Add an overlap check. When player touches it, call puzzleSolved.
@@ -424,8 +430,245 @@ function fixGlitch(data) {
           platform.setTint(0x00ccff);
         }
       });
-      scene.isWorldGlitched = false;
 
+      // Remove the barrier
+      if (scene.barrier) {
+        scene.barrier.destroy();
+      }
+    },
+  },
+  // level 4
+  {
+    // harder jumps
+    platforms: [
+      { x: 800, y: 1000 },
+      { x: 900, y: 880 },
+      { x: 800, y: 757 },
+      { x: 900, y: 640 },
+      { x: 1300, y: 600 },
+      { x: 1700, y: 500 },
+    ],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1700, y: 450 },
+    terminal: { x: 400, y: 995 },
+    successMessage: "Level 4 completed!.",
+    puzzle: {
+      prompt: `/*
+Level 4: Data Stream
+Nyx taunts: "The data stream is corrupted!
+Write a function filterData(data) that takes an 
+array of numbers and returns a new array with only the even numbers."
+*/
+function filterData(data) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(
+            code + "\nreturn filterData([1, 2, 3, 4]);"
+          )();
+          const fn2 = new Function(
+            code + "\nreturn filterData([5, 6, 7, 8]);"
+          )();
+          const fn3 = new Function(
+            code + "\nreturn filterData([-10, 0, 10]);"
+          )();
+          return (
+            JSON.stringify(fn1) === JSON.stringify([2, 4]) &&
+            JSON.stringify(fn2) === JSON.stringify([6, 8]) &&
+            JSON.stringify(fn3) === JSON.stringify([-10, 0, 10])
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 4", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+
+      // STORY
+
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the data stream, making it unstable.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
+      scene.add.text(20, 140, "Nyx taunts: 'You can't filter the data!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // Create a barrier to prevent jumping over the winBlock
+      scene.barrier = scene.physics.add.staticSprite(
+        level.winBlock.x - 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier.setTintFill(0xff0000);
+      scene.barrier.setScale(0.05, 6).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier);
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      scene.platforms.getChildren().forEach((platform) => {
+        if (platform.flickerTimer) {
+          platform.flickerTimer.remove();
+          platform.flickerTimer = null;
+          platform.setVisible(true);
+          platform.enableBody(true, platform.x, platform.y, true, true);
+          platform.setTint(0x00ccff);
+        }
+      });
+      // Remove the barrier
+      if (scene.barrier) {
+        scene.barrier.destroy();
+      }
+    },
+  },
+  // level 5
+  {
+    platforms: [
+      { x: 600, y: 1000 },
+      { x: 900, y: 900 },
+      { x: 1200, y: 777 },
+      { x: 900, y: 680 },
+      { x: 1300, y: 600 },
+      { x: 1700, y: 500 },
+    ],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1700, y: 450 },
+    terminal: { x: 400, y: 995 },
+    successMessage: "Level 5 completed!.",
+    puzzle: {
+      prompt: `/*
+Level 5: Complex Data
+Nyx taunts: "The data is too complex!
+Write a function processData(data) that 
+takes an array of numbers and returns a 
+new array with each number squared."
+*/
+function processData(data) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(code + "\nreturn processData([1, 2, 3]);")();
+          const fn2 = new Function(code + "\nreturn processData([4, 5, 6]);")();
+          const fn3 = new Function(
+            code + "\nreturn processData([-1, -2, -3]);"
+          )();
+          return (
+            JSON.stringify(fn1) === JSON.stringify([1, 4, 9]) &&
+            JSON.stringify(fn2) === JSON.stringify([16, 25, 36]) &&
+            JSON.stringify(fn3) === JSON.stringify([1, 4, 9])
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 5", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+
+      // STORY
+
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the data, making it too complex.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
+      scene.add.text(20, 140, "Nyx taunts: 'You can't process this data!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // Create a barrier to prevent jumping over the winBlock
+      scene.barrier = scene.physics.add.staticSprite(
+        level.winBlock.x - 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier.setTintFill(0xff0000);
+      scene.barrier.setScale(0.05, 6).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier);
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      scene.platforms.getChildren().forEach((platform) => {
+        if (platform.flickerTimer) {
+          platform.flickerTimer.remove();
+          platform.flickerTimer = null;
+          platform.setVisible(true);
+          platform.enableBody(true, platform.x, platform.y, true, true);
+          platform.setTint(0x00ccff);
+        }
+      });
       // Remove the barrier
       if (scene.barrier) {
         scene.barrier.destroy();
@@ -505,7 +748,8 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 3;
+    this.levelIndex = data.levelIndex || 5;
+    this.totalTime = data.totalTime || 0;
     this.isWorldGlitched = true;
   }
 
@@ -516,6 +760,7 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.testWorker = null;
     const level = levels[this.levelIndex];
     this.player = this.physics.add
       .sprite(level.playerStart.x, level.playerStart.y, "player")
@@ -524,6 +769,22 @@ class MainScene extends Phaser.Scene {
     if (level.setup) {
       level.setup(this);
     }
+
+    this.timerText = this.add
+      .text(size.width - 250, 20, `Time: ${this.totalTime}s`, {
+        font: "24px Courier",
+        fill: "#ffffff",
+      })
+      .setScrollFactor(0);
+
+    this.gameTimer = this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.totalTime++;
+        this.timerText.setText(`Time: ${this.totalTime}s`);
+      },
+      loop: true,
+    });
 
     const gfx = this.add.graphics();
     gfx.fillStyle(0x8888ff, 1);
@@ -684,24 +945,70 @@ class MainScene extends Phaser.Scene {
       );
       this.codeMirror.focus();
 
-      document.getElementById("run-btn").onclick = () => {
-        const userCode = this.codeMirror.getValue();
-        let success = false;
-        try {
-          success = levels[this.levelIndex].puzzle.test(userCode);
-        } catch (err) {
-          alert("Error in your code:\n" + err.message);
+      const runButton = document.getElementById("run-btn");
+      let isTesting = false;
+
+      runButton.onclick = () => {
+        if (isTesting) {
           return;
         }
 
-        if (success) {
-          const level = levels[this.levelIndex];
-          if (level.onPuzzleSuccess) {
-            level.onPuzzleSuccess(this);
-          }
-        } else {
-          alert("Not quite—try again!");
+        if (!this.testWorker) {
+          this.testWorker = new Worker("test-runner.js");
         }
+
+        const userCode = this.codeMirror.getValue();
+        const level = levels[this.levelIndex];
+
+        // testing...
+        isTesting = true;
+        runButton.textContent = "Testing...";
+        runButton.disabled = true;
+
+        const cleanup = () => {
+          isTesting = false;
+          runButton.textContent = "Run ▶️";
+          runButton.disabled = false;
+        };
+
+        // timeout handler
+        const timeoutId = setTimeout(() => {
+          this.testWorker.terminate();
+          console.log("Test worker terminated due to timeout.");
+          this.testWorker = null;
+          alert(
+            "Execution timed out! Your code might have an infinite loop. Please check your code for efficiency."
+          );
+          runButton.textContent = "Penalty (its 10s)";
+          runButton.disabled = true;
+          setTimeout(() => {
+            cleanup(); // Reset after penalty
+          }, 10000);
+        }, 4000);
+
+        this.testWorker.onmessage = (event) => {
+          clearTimeout(timeoutId);
+          const { success, error } = event.data;
+          if (success) {
+            if (level.onPuzzleSuccess) {
+              level.onPuzzleSuccess(this);
+            }
+          } else {
+            alert("Not quite—try again! " + (error || ""));
+          }
+          cleanup();
+        };
+
+        this.testWorker.onerror = (event) => {
+          clearTimeout(timeoutId);
+          alert("An error occurred in the test runner: " + event.message);
+          cleanup();
+        };
+
+        this.testWorker.postMessage({
+          userCode: userCode,
+          levelTestString: level.puzzle.test.toString(),
+        });
       };
     }
   }
@@ -738,14 +1045,23 @@ class MainScene extends Phaser.Scene {
     });
     // After showing success, advance to next level if available
     if (this.levelIndex + 1 < levels.length) {
-      setTimeout(() => {
-        this.scene.restart({ levelIndex: this.levelIndex + 1 });
-      }, 2000);
-    } else {
-      this.add.text(40, 400, "🏆 All levels complete! 🏆", {
-        font: "40px Courier",
-        fill: "#ffff00",
+      this.time.delayedCall(2000, () => {
+        this.scene.restart({
+          levelIndex: this.levelIndex + 1,
+          totalTime: this.totalTime,
+        });
       });
+    } else {
+      this.gameTimer.destroy();
+      this.add.text(
+        40,
+        400,
+        `🏆 All levels complete! Final Time: ${this.totalTime}s 🏆`,
+        {
+          font: "40px Courier",
+          fill: "#ffff00",
+        }
+      );
     }
   }
 }

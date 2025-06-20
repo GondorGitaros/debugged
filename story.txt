@@ -1,3 +1,5 @@
+SOME NOTE: YOU CAN MAKE A 500 wide 200 hight jump
+
 The Full Story
 You are Alex, a brilliant programmer who has just finished creating your masterpiece: a vast, beautiful virtual world. But on the day of its launch, a rival hacker known as "Nyx" unleashes a sophisticated, multi-layered virus that corrupts your creation from the inside out. The world begins to glitch, its fundamental laws of physics breaking down.
 
