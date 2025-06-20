@@ -684,11 +684,19 @@ class StoryScene extends Phaser.Scene {
     super("StoryScene");
   }
 
+  init(data) {
+    this.progress = data;
+  }
+
   preload() {
     this.load.image("story-bg", "/assets/story_background.png");
   }
 
   create() {
+    if (this.progress && this.progress.levelIndex > 0) {
+      this.scene.start("MainScene", this.progress);
+      return;
+    }
     this.add
       .image(size.width / 2, size.height / 2, "story-bg")
       .setDisplaySize(size.width, size.height);
@@ -725,18 +733,15 @@ class StoryScene extends Phaser.Scene {
       },
       repeat: fullStoryText.length - 1,
     });
+
     this.input.on("pointerdown", () => {
-      if (!this.isTyping) {
+      if (this.isTyping) {
         timedEvent.remove();
         textObject.text = fullStoryText;
         this.isTyping = false;
       } else {
-        this.scene.start("MainScene", { levelIndex: 0 });
+        this.scene.start("MainScene", this.progress);
       }
-    });
-
-    this.input.once("pointerdown", () => {
-      this.scene.start("MainScene", { levelIndex: 0 });
     });
   }
 }
@@ -748,7 +753,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 5;
+    this.levelIndex = data.levelIndex || 0;
     this.totalTime = data.totalTime || 0;
     this.isWorldGlitched = true;
   }
@@ -1023,7 +1028,6 @@ class MainScene extends Phaser.Scene {
 
   puzzleSolved() {
     const level = levels[this.levelIndex];
-    // hide terminal UI
     document.getElementById("terminal-container").style.display = "none";
     this.scene.resume();
     this.inTerminal = false;
@@ -1031,6 +1035,21 @@ class MainScene extends Phaser.Scene {
     this.closeTerminal();
     this.terminal.setTint(0x00ff00);
     this.cameras.main.flash(300, 0, 255, 0);
+
+    // Save progress before advancing
+    const user = localStorage.getItem("currentUser");
+    const nextLevelIndex = this.levelIndex + 1;
+    if (user && nextLevelIndex < levels.length) {
+      fetch("saveProgress.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: user,
+          level: nextLevelIndex,
+          time: this.totalTime,
+        }),
+      });
+    }
 
     // Fix the world!
     this.isWorldGlitched = false;
@@ -1066,10 +1085,25 @@ class MainScene extends Phaser.Scene {
   }
 }
 
-function startGame() {
+async function startGame() {
   const gameContainer = document.getElementById("game-container");
   if (gameContainer) {
     gameContainer.innerHTML = "";
+  }
+
+  let progress = { levelIndex: 0, totalTime: 0 };
+  const user = localStorage.getItem("currentUser");
+  if (user) {
+    try {
+      const res = await fetch(`getProgress.php?username=${user}`);
+      const data = await res.json();
+      if (data.success) {
+        progress.levelIndex = data.level || 0;
+        progress.totalTime = data.time || 0;
+      }
+    } catch (err) {
+      console.error("Could not fetch progress, starting from scratch.", err);
+    }
   }
 
   const config = {
@@ -1088,6 +1122,7 @@ function startGame() {
     },
     scene: [StoryScene, MainScene],
   };
-  new Phaser.Game(config);
+  const game = new Phaser.Game(config);
+  game.scene.start("StoryScene", progress);
 }
 startGame();

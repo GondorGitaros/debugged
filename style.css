@@ -53,6 +53,21 @@ canvas {
   margin-top: 4px;
 }
 
+#reset-progress-button {
+  position: absolute;
+  top: 50px;
+  right: 5px;
+  background-color: #ff4444;
+  color: #1e1e1e;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1em;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
 #run-btn {
   position: absolute;
   bottom: 10px;
