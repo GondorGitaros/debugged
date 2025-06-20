@@ -124,7 +124,7 @@ function add(a, b) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 1", {
+      scene.add.text(20, 20, "👾 Debugged - Level 1/16", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -240,7 +240,7 @@ function calculateChecksum(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 2", {
+      scene.add.text(20, 20, "👾 Debugged - Level 2/16", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -363,7 +363,7 @@ function fixGlitch(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 3", {
+      scene.add.text(20, 20, "👾 Debugged - Level 3/16", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -485,7 +485,7 @@ function filterData(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 4", {
+      scene.add.text(20, 20, "👾 Debugged - Level 4/16", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -602,7 +602,7 @@ function processData(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 5", {
+      scene.add.text(20, 20, "👾 Debugged - Level 5/16", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -717,7 +717,7 @@ function cleanData(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 6", {
+      scene.add.text(20, 20, "👾 Debugged - Level 6/16", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -768,6 +768,107 @@ function cleanData(data) {
         .setTint(0x00ff00)
         .refreshBody();
       platform.originalTint = platform.tintTopLeft;
+    },
+  },
+  // level 7
+  {
+    platforms: [],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1700, y: 975 },
+    terminal: { x: 400, y: 995 },
+    successMessage: "Level 7 completed!.",
+    // leetcode style puzzle
+    puzzle: {
+      prompt: `/*Level 7: findMax
+Nyx taunts: "The data is too complex!
+Write a function findMax(data) that takes an array of numbers
+and returns the maximum number."
+*/
+function findMax(data) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(code + "\nreturn findMax([1, 2, 3]);")();
+          const fn2 = new Function(code + "\nreturn findMax([4, 5, 6]);")();
+          const fn3 = new Function(code + "\nreturn findMax([-1, -2, -3]);")();
+          return fn1 === 3 && fn2 === 6 && fn3 === -1;
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 7/16", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+      // STORY
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the data, making it too complex.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+      scene.add.text(20, 140, "Nyx taunts: 'You can't find the maximum!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // surround the player with 3 barriers to prevent jumping over the winBlock
+      scene.barrier1 = scene.physics.add.staticSprite(500, 900, "platform");
+      scene.barrier1.setTintFill(0xff0000);
+      scene.barrier1.setScale(100, 1).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier1);
+      scene.barrier2 = scene.physics.add.staticSprite(1000, 900, "platform");
+      scene.barrier2.setTintFill(0xff0000);
+      scene.barrier2.setScale(1, 100).refreshBody();
+      scene.barrier2.refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier2);
+
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      scene.platforms.getChildren().forEach((platform) => {
+        if (platform.flickerTimer) {
+          platform.flickerTimer.remove();
+          platform.flickerTimer = null;
+          platform.setVisible(true);
+          platform.enableBody(true, platform.x, platform.y, true, true);
+          platform.setTint(0x00ccff);
+        }
+      });
+      // Remove the barriers
+      if (scene.barrier1) {
+        scene.barrier1.destroy();
+      }
+      if (scene.barrier2) {
+        scene.barrier2.destroy();
+      }
     },
   },
 
@@ -848,7 +949,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 6;
+    this.levelIndex = data.levelIndex || 7;
     this.totalTime = data.totalTime || 0;
     this.isWorldGlitched = true;
   }
@@ -877,14 +978,10 @@ class MainScene extends Phaser.Scene {
       })
       .setScrollFactor(0);
 
-    this.gameTimer = this.time.addEvent({
-      delay: 1000,
-      callback: () => {
-        this.totalTime++;
-        this.timerText.setText(`Time: ${this.totalTime}s`);
-      },
-      loop: true,
-    });
+    this.gameTimer = setInterval(() => {
+      this.totalTime++;
+      this.timerText.setText(`Time: ${this.totalTime}s`);
+    }, 1000);
 
     const gfx = this.add.graphics();
     gfx.fillStyle(0x8888ff, 1);
@@ -1022,6 +1119,10 @@ class MainScene extends Phaser.Scene {
   }
 
   shutdown() {
+    if (this.codeMirror) {
+      this.codeMirror.toTextArea();
+      this.codeMirror = null;
+    }
     if (this.codeMirror) {
       this.codeMirror.toTextArea();
       this.codeMirror = null;
@@ -1166,7 +1267,7 @@ class MainScene extends Phaser.Scene {
         });
       });
     } else {
-      this.gameTimer.destroy();
+      clearInterval(this.gameTimer);
       this.add.text(
         40,
         400,
