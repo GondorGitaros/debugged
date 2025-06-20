@@ -138,6 +138,33 @@ function add(a, b) {
         }
       );
 
+      // STORY
+
+      scene.add.text(20, 100, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+
+      scene.add.text(
+        20,
+        140,
+        "Nyx has corrupted the world, and you need to fix it by solving puzzles.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
+      scene.add.text(
+        20,
+        180,
+        "Nyx taunts: 'There is a block missing... I don't think you can fix it!'",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
       const level = levels[scene.levelIndex];
       const winBlock = scene.physics.add.staticSprite(
         level.winBlock.x,
@@ -213,10 +240,43 @@ function calculateChecksum(data) {
         font: "20px Courier",
         fill: "#00ffcc",
       });
-      scene.add.text(20, 60, "The platforms are unstable!", {
+
+      // STORY
+
+      scene.add.text(20, 60, "Story:", {
         font: "24px Courier",
-        fill: "#ff0000",
+        fill: "#00ffcc",
       });
+
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the platforms, making them unstable.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
+      scene.add.text(
+        20,
+        140,
+        "Nyx taunts: 'The platforms are tied to a data stream.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
+      scene.add.text(
+        20,
+        160,
+        "If you can't calculate the correct checksum, they'll stay unstable forever!'",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
 
       const level = levels[scene.levelIndex];
       const winBlock = scene.physics.add.staticSprite(
@@ -249,6 +309,127 @@ function calculateChecksum(data) {
           platform.setTint(0x00ccff);
         }
       });
+      scene.isWorldGlitched = false;
+    },
+  },
+  // level 3
+  {
+    platforms: [
+      { x: 200, y: 1000 },
+      { x: 500, y: 900 },
+      { x: 800, y: 800 },
+      { x: 1100, y: 700 },
+      { x: 1400, y: 600 },
+      { x: 1700, y: 500 },
+    ],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1700, y: 450 },
+    terminal: { x: 400, y: 995 },
+    successMessage: "Level 3 completed! The world is stabilizing.",
+    puzzle: {
+      prompt: `/*
+Level 3: Glitchy World
+Nyx taunts: "The world is glitching! Write a function fixGlitch(data) that takes an array of numbers and returns a new array with all negative numbers replaced by their absolute values."
+*/
+function fixGlitch(data) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(
+            code + "\nreturn fixGlitch([-1, -2, 3, 4]);"
+          )();
+          const fn2 = new Function(
+            code + "\nreturn fixGlitch([5, -6, 7, -8]);"
+          )();
+          const fn3 = new Function(
+            code + "\nreturn fixGlitch([-10, 0, 10]);"
+          )();
+          return (
+            JSON.stringify(fn1) === JSON.stringify([1, 2, 3, 4]) &&
+            JSON.stringify(fn2) === JSON.stringify([5, 6, 7, 8]) &&
+            JSON.stringify(fn3) === JSON.stringify([10, 0, 10])
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 3", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+
+      // STORY
+
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the world, the data is blocked.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+
+      scene.add.text(20, 140, "Nyx taunts: 'Ain't no way you can fix it!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // Create a barrier to prevent jumping over the winBlock
+      scene.barrier = scene.physics.add.staticSprite(
+        level.winBlock.x - 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier.setTintFill(0xff0000);
+      scene.barrier.setScale(0.5, 3).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier);
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      scene.platforms.getChildren().forEach((platform) => {
+        if (platform.flickerTimer) {
+          platform.flickerTimer.remove();
+          platform.flickerTimer = null;
+          platform.setVisible(true);
+          platform.enableBody(true, platform.x, platform.y, true, true);
+          platform.setTint(0x00ccff);
+        }
+      });
+      scene.isWorldGlitched = false;
+
+      // Remove the barrier
+      if (scene.barrier) {
+        scene.barrier.destroy();
+      }
     },
   },
 
@@ -324,7 +505,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 0;
+    this.levelIndex = data.levelIndex || 3;
     this.isWorldGlitched = true;
   }
 
@@ -411,7 +592,10 @@ class MainScene extends Phaser.Scene {
     });
 
     this.interactText = this.add
-      .text(0, 0, "Press E to interact", { font: "16px Courier", fill: "#fff" })
+      .text(0, 0, "Press E to interact", {
+        font: "16px Courier",
+        fill: "#fff",
+      })
       .setVisible(false);
 
     this.keyE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
