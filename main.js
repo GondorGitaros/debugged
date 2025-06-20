@@ -949,7 +949,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 7;
+    this.levelIndex = data.levelIndex || 0;
     this.totalTime = data.totalTime || 0;
     this.isWorldGlitched = true;
   }
