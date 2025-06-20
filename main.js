@@ -324,7 +324,7 @@ class MainScene extends Phaser.Scene {
   }
 
   init(data) {
-    this.levelIndex = data.levelIndex || 2;
+    this.levelIndex = data.levelIndex || 0;
     this.isWorldGlitched = true;
   }
 
