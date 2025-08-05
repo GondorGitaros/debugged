@@ -871,6 +871,136 @@ function findMax(data) {
       }
     },
   },
+  // level 8
+  {
+    platforms: [
+      { x: 300, y: 1000 },
+      { x: 600, y: 900 },
+      { x: 600, y: 800 },
+      { x: 1000, y: 700 },
+      { x: 1000, y: 650 },
+      { x: 1400, y: 550 },
+      { x: 1400, y: 500 },
+      { x: 1700, y: 400 },
+    ],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1700, y: 350 },
+    terminal: { x: 600, y: 990 },
+    successMessage: "Level 8 completed! Objects mastered.",
+    puzzle: {
+      prompt: `/*
+Level 8: Object Manipulation
+Nyx taunts: "Objects are too complex for you!
+Write a function getProperty(obj, key) that takes an object
+and a key, and returns the value of that property.
+If the property doesn't exist, return undefined."
+*/
+function getProperty(obj, key) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(
+            code + "\nreturn getProperty({name: 'Alice', age: 25}, 'name');"
+          )();
+          const fn2 = new Function(
+            code + "\nreturn getProperty({x: 10, y: 20}, 'y');"
+          )();
+          const fn3 = new Function(
+            code + "\nreturn getProperty({a: 1, b: 2}, 'c');"
+          )();
+          const fn4 = new Function(
+            code + "\nreturn getProperty({}, 'missing');"
+          )();
+          return fn1 === 'Alice' && fn2 === 20 && fn3 === undefined && fn4 === undefined;
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 8/16", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+      // STORY
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the object system, making properties inaccessible.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+      scene.add.text(20, 140, "Nyx taunts: 'Objects are beyond your comprehension!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // Create multiple barriers for increased difficulty
+      scene.barrier1 = scene.physics.add.staticSprite(
+        level.winBlock.x - 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier1.setTintFill(0xff0000);
+      scene.barrier1.setScale(0.05, 8).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier1);
+
+      scene.barrier2 = scene.physics.add.staticSprite(
+        level.winBlock.x + 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier2.setTintFill(0xff0000);
+      scene.barrier2.setScale(0.05, 8).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier2);
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      scene.platforms.getChildren().forEach((platform) => {
+        if (platform.flickerTimer) {
+          platform.flickerTimer.remove();
+          platform.flickerTimer = null;
+          platform.setVisible(true);
+          platform.enableBody(true, platform.x, platform.y, true, true);
+          platform.setTint(0x00ccff);
+        }
+      });
+      // Remove the barriers
+      if (scene.barrier1) {
+        scene.barrier1.destroy();
+      }
+      if (scene.barrier2) {
+        scene.barrier2.destroy();
+      }
+    },
+  },
 
   // TODO add more levels
 ];
