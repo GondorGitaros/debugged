@@ -124,7 +124,7 @@ function add(a, b) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 1/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 1/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -240,7 +240,7 @@ function calculateChecksum(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 2/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 2/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -363,7 +363,7 @@ function fixGlitch(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 3/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 3/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -485,7 +485,7 @@ function filterData(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 4/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 4/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -602,7 +602,7 @@ function processData(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 5/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 5/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -717,7 +717,7 @@ function cleanData(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 6/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 6/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -800,7 +800,7 @@ function findMax(data) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 7/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 7/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -920,7 +920,7 @@ function getProperty(obj, key) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 8/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 8/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -1048,7 +1048,7 @@ function factorial(n) {
       },
     },
     setup: function (scene) {
-      scene.add.text(20, 20, "👾 Debugged - Level 9/16", {
+      scene.add.text(20, 20, "👾 Debugged - Level 9/10", {
         font: "20px Courier",
         fill: "#00ffcc",
       });
@@ -1112,6 +1112,192 @@ function factorial(n) {
       if (scene.barrier) {
         scene.barrier.destroy();
       }
+    },
+  },
+  // level 10 - Final Boss Level
+  {
+    platforms: [
+      { x: 400, y: 950 },
+      { x: 800, y: 800 },
+      { x: 600, y: 850 },
+      { x: 1200, y: 700 },
+      { x: 1600, y: 600 },
+    ],
+    playerStart: { x: 100, y: 950 },
+    winBlock: { x: 1600, y: 550 },
+    terminal: { x: 400, y: 870 },
+    successMessage: "🎉 FINAL LEVEL COMPLETED! NYX DEFEATED! 🎉",
+    puzzle: {
+      prompt: `/*
+FINAL CHALLENGE - Level 10: The Ultimate Algorithm
+Nyx's final taunt: "This will break your mind completely!
+I've created the most complex challenge possible!"
+
+CHALLENGE: Implement a function that finds the longest increasing subsequence
+in an array and returns its LENGTH.
+
+A subsequence maintains relative order but doesn't need to be contiguous.
+Example: [10, 22, 9, 33, 21, 50, 41, 60, 80]
+Longest increasing subsequence: [10, 22, 33, 50, 60, 80] (length = 6)
+
+The function must handle:
+- Arrays with negative numbers
+- Arrays with duplicates (duplicates break the increasing sequence)
+- Empty arrays (return 0)
+- Single element arrays (return 1)
+
+This is a classic Dynamic Programming problem. Good luck!
+*/
+function longestIncreasingSubsequence(arr) {
+  // your code here... this is the ultimate test!
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          
+          // Test case 1: Basic example
+          const fn1 = new Function(code + "\nreturn longestIncreasingSubsequence([10, 22, 9, 33, 21, 50, 41, 60, 80]);")();
+          
+          // Test case 2: Empty array
+          const fn2 = new Function(code + "\nreturn longestIncreasingSubsequence([]);")();
+          
+          // Test case 3: Single element
+          const fn3 = new Function(code + "\nreturn longestIncreasingSubsequence([5]);")();
+          
+          // Test case 4: Decreasing array
+          const fn4 = new Function(code + "\nreturn longestIncreasingSubsequence([5, 4, 3, 2, 1]);")();
+          
+          // Test case 5: All same elements
+          const fn5 = new Function(code + "\nreturn longestIncreasingSubsequence([3, 3, 3, 3]);")();
+          
+          // Test case 6: With negative numbers
+          const fn6 = new Function(code + "\nreturn longestIncreasingSubsequence([-10, -5, 0, 3, 7]);")();
+          
+          // Test case 7: Complex case
+          const fn7 = new Function(code + "\nreturn longestIncreasingSubsequence([1, 3, 6, 7, 9, 4, 10, 5, 6]);")();
+          
+          // Test case 8: Another complex case
+          const fn8 = new Function(code + "\nreturn longestIncreasingSubsequence([0, 1, 0, 3, 2, 3]);")();
+          
+          return (
+            fn1 === 6 &&    // [10, 22, 33, 50, 60, 80]
+            fn2 === 0 &&    // empty array
+            fn3 === 1 &&    // single element
+            fn4 === 1 &&    // decreasing array
+            fn5 === 1 &&    // all same elements
+            fn6 === 5 &&    // [-10, -5, 0, 3, 7]
+            fn7 === 6 &&    // [1, 3, 6, 7, 9, 10] - correct length is 6, not 5
+            fn8 === 4       // [0, 1, 2, 3]
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - FINAL LEVEL 10/10", {
+        font: "24px Courier",
+        fill: "#ff0000",
+      });
+      
+      scene.add.text(20, 60, "🏆 THE ULTIMATE CHALLENGE 🏆", {
+        font: "20px Courier",
+        fill: "#ffff00",
+      });
+      
+      // STORY
+      scene.add.text(20, 100, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+      
+      scene.add.text(
+        20,
+        140,
+        "This is it! Nyx's final stand. The core algorithm that controls",
+        {
+          font: "20px Courier",
+          fill: "#44ff44",
+        }
+      );
+      
+      scene.add.text(
+        20,
+        165,
+        "the entire corrupted system. Solve this, and you save the world!",
+        {
+          font: "20px Courier",
+          fill: "#44ff44",
+        }
+      );
+      
+      scene.add.text(
+        20,
+        200,
+        "Nyx screams: 'This dynamic programming problem will destroy you!'",
+        {
+          font: "20px Courier",
+          fill: "#ff4444",
+        }
+      );
+      
+      scene.add.text(
+        20,
+        235,
+        "WARNING: This is extremely difficult. Take your time!",
+        {
+          font: "22px Courier",
+          fill: "#ff8800",
+        }
+      );
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+      
+      // Make the final data block glow differently
+      winBlock.setTint(0xffd700); // Gold color for final level
+
+      // Create a barrier to prevent accessing the data block
+      scene.barrier = scene.physics.add.staticSprite(
+        level.winBlock.x - 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier.setTintFill(0xff0000);
+      scene.barrier.setScale(0.05, 8).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier);
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      
+      // Epic final level completion
+      scene.platforms.getChildren().forEach((platform) => {
+        platform.setTint(0xffd700); // Gold color
+      });
+
+      // Remove the barrier
+      if (scene.barrier) {
+        scene.barrier.destroy();
+      }
+      
+      // Add victory effects
+      scene.cameras.main.flash(1000, 255, 215, 0); // Gold flash
     },
   },
 
