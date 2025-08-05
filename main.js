@@ -1001,6 +1001,119 @@ function getProperty(obj, key) {
       }
     },
   },
+  // level 9
+  {
+    platforms: [
+      { x: 350, y: 950 },
+      { x: 650, y: 850 },
+      { x: 950, y: 750 },
+      { x: 1250, y: 650 },
+      { x: 1550, y: 550 },
+      { x: 1850, y: 450 },
+    ],
+    playerStart: { x: 100, y: 900 },
+    winBlock: { x: 1850, y: 400 },
+    terminal: { x: 200, y: 995 },
+    successMessage: "Level 9 completed! Algorithm mastery achieved.",
+    puzzle: {
+      prompt: `/*
+Level 9: Recursive Challenge
+Nyx taunts: "Recursion will break your mind!
+Write a function factorial(n) that calculates the factorial of n.
+Factorial of n is n * (n-1) * (n-2) * ... * 1
+Example: factorial(5) = 5 * 4 * 3 * 2 * 1 = 120
+Note: factorial(0) = 1 by definition"
+*/
+function factorial(n) {
+  // your code here...
+}`,
+      test: function (userCode) {
+        try {
+          const code = userCode;
+          const fn1 = new Function(code + "\nreturn factorial(0);")();
+          const fn2 = new Function(code + "\nreturn factorial(1);")();
+          const fn3 = new Function(code + "\nreturn factorial(5);")();
+          const fn4 = new Function(code + "\nreturn factorial(6);")();
+          const fn5 = new Function(code + "\nreturn factorial(3);")();
+          return (
+            fn1 === 1 && 
+            fn2 === 1 && 
+            fn3 === 120 && 
+            fn4 === 720 &&
+            fn5 === 6
+          );
+        } catch {
+          return false;
+        }
+      },
+    },
+    setup: function (scene) {
+      scene.add.text(20, 20, "👾 Debugged - Level 9/16", {
+        font: "20px Courier",
+        fill: "#00ffcc",
+      });
+      // STORY
+      scene.add.text(20, 60, "Story:", {
+        font: "24px Courier",
+        fill: "#00ffcc",
+      });
+      scene.add.text(
+        20,
+        100,
+        "Nyx has corrupted the mathematical core, breaking all calculations.",
+        {
+          font: "24px Courier",
+          fill: "#44ff44",
+        }
+      );
+      scene.add.text(20, 140, "Nyx taunts: 'Recursion will consume you!'", {
+        font: "24px Courier",
+        fill: "#44ff44",
+      });
+
+      const level = levels[scene.levelIndex];
+      const winBlock = scene.physics.add.staticSprite(
+        level.winBlock.x,
+        level.winBlock.y,
+        "data"
+      );
+
+      // Create a barrier to prevent accessing the data block
+      scene.barrier = scene.physics.add.staticSprite(
+        level.winBlock.x - 120,
+        level.winBlock.y,
+        "platform"
+      );
+      scene.barrier.setTintFill(0xff0000);
+      scene.barrier.setScale(0.05, 6).refreshBody();
+      scene.physics.add.collider(scene.player, scene.barrier);
+
+      // Add an overlap check. When player touches it, call puzzleSolved.
+      scene.physics.add.overlap(
+        scene.player,
+        winBlock,
+        () => {
+          scene.puzzleSolved();
+          winBlock.destroy();
+        },
+        null,
+        scene
+      );
+    },
+    onPuzzleSuccess: function (scene) {
+      scene.closeTerminal();
+      
+      // Stabilize all platforms with a simple green tint
+      scene.platforms.getChildren().forEach((platform) => {
+        platform.setTint(0x00ff00);
+      });
+
+      // Remove the barrier
+      if (scene.barrier) {
+        scene.barrier.destroy();
+      }
+    },
+  },
 
   // TODO add more levels
 ];
