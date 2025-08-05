@@ -1701,6 +1701,20 @@ class MainScene extends Phaser.Scene {
         });
       });
     } else {
+      // Game completed! Save final progress
+      const user = localStorage.getItem("currentUser");
+      if (user) {
+        fetch("saveProgress.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: user,
+            level: 10, // Completed all levels
+            time: this.totalTime,
+          }),
+        });
+      }
+      
       if (this.gameTimer) {
         clearInterval(this.gameTimer);
       }

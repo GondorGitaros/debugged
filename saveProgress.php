@@ -27,14 +27,57 @@ if ($mysqli->connect_errno) {
     exit;
 }
 
-$stmt = $mysqli->prepare('UPDATE users SET current_level = ?, total_time = ? WHERE username = ?');
-$stmt->bind_param('iis', $level, $time, $username);
+$stmt = $mysqli->prepare('
+    INSERT INTO user_progress (username, level, completed_at) 
+    VALUES (?, ?, NOW()) 
+    ON DUPLICATE KEY UPDATE 
+        level = GREATEST(level, VALUES(level)), 
+        completed_at = IF(VALUES(level) > level, NOW(), completed_at)
+');
+$stmt->bind_param('si', $username, $level);
 
-if ($stmt->execute()) {
-    echo json_encode(['success' => true]);
+// Update users table with current progress (no best_time logic here)
+$stmt2 = $mysqli->prepare('
+    UPDATE users 
+    SET current_level = ?, 
+        total_time = ?
+    WHERE username = ?
+');
+$stmt2->bind_param('iis', $level, $time, $username);
+
+if ($stmt->execute() && $stmt2->execute()) {
+    // If user completed the game (level 10), fix all best times
+    if ($level >= 10) {
+        require_once __DIR__ . '/fix_best_time.php';
+        
+        try {
+            $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+            $affected = fixAllBestTimes($pdo);
+        } catch (Exception $e) {
+            // Don't fail the save if the fix fails
+            error_log("Best time fix failed: " . $e->getMessage());
+        }
+    }
+    
+    // Get the updated values to confirm what was actually saved
+    $verify = $mysqli->prepare('SELECT current_level, total_time, best_time FROM users WHERE username = ?');
+    $verify->bind_param('s', $username);
+    $verify->execute();
+    $result = $verify->get_result()->fetch_assoc();
+    $verify->close();
+    
+    echo json_encode([
+        'success' => true, 
+        'debug' => [
+            'input' => ['level' => $level, 'time' => $time, 'username' => $username],
+            'saved' => $result,
+            'best_times_fixed' => $level >= 10 ? ($affected ?? 0) : 0
+        ]
+    ]);
 } else {
-    echo json_encode(['success' => false, 'error' => 'Failed to save progress']);
+    echo json_encode(['success' => false, 'error' => 'Failed to save progress', 'mysqli_error' => $mysqli->error]);
 }
 $stmt->close();
+$stmt2->close();
 $mysqli->close();
 ?>
