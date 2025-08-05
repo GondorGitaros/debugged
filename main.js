@@ -978,6 +978,7 @@ class MainScene extends Phaser.Scene {
       })
       .setScrollFactor(0);
 
+    // Use a regular setInterval that won't be affected by scene pause
     this.gameTimer = setInterval(() => {
       this.totalTime++;
       this.timerText.setText(`Time: ${this.totalTime}s`);
@@ -1119,6 +1120,10 @@ class MainScene extends Phaser.Scene {
   }
 
   shutdown() {
+    if (this.gameTimer) {
+      clearInterval(this.gameTimer);
+      this.gameTimer = null;
+    }
     if (this.codeMirror) {
       this.codeMirror.toTextArea();
       this.codeMirror = null;
@@ -1267,7 +1272,9 @@ class MainScene extends Phaser.Scene {
         });
       });
     } else {
-      clearInterval(this.gameTimer);
+      if (this.gameTimer) {
+        clearInterval(this.gameTimer);
+      }
       this.add.text(
         40,
         400,
